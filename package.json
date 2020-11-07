@@ -1,17 +1,21 @@
 {
-  "name": "grammarly-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@stewartmcgown/grammarly-api": "^1.1.2",
-    "discord.js": "^12.4.1",
-    "dotenv": "^8.2.0"
-  }
+	"name": "grammarly-bot",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"start": "node app.js",
+		"dev": "nodemon app.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@stewartmcgown/grammarly-api": "^1.1.2",
+		"discord.js": "^12.4.1",
+		"dotenv": "^8.2.0"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.6"
+	}
 }
