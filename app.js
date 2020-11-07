@@ -14,7 +14,7 @@ if (process.env.GRAUTH && process.env.CSRF_TOKEN) {
 			'csrf-token': process.env.CSRF_TOKEN
 		}
 	});
-	console.log('Using grammarly FREE');
+	console.log('Using grammarly PREMIUM');
 } else {
 	// setup grammarly free
 	grammarly = new Grammarly();
