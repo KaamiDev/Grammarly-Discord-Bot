@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@stewartmcgown/grammarly-api": "^1.1.2"
+    "@stewartmcgown/grammarly-api": "^1.1.2",
+    "dotenv": "^8.2.0"
   }
 }
