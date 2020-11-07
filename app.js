@@ -15,11 +15,11 @@ if (process.env.GRAUTH && process.env.CSRF_TOKEN) {
 			'csrf-token': process.env.CSRF_TOKEN
 		}
 	});
-	console.log('Using grammarly PREMIUM');
+	console.log('Using Grammarly PREMIUM');
 } else {
 	// setup grammarly free
 	grammarly = new Grammarly();
-	console.log('Using grammarly FREE');
+	console.log('Using Grammarly FREE');
 }
 
 // initialize discord api
@@ -28,12 +28,20 @@ client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// test text
-const text = `When we have shuffled off this mortal coil,
-Must give us pause - their's the respect
-That makes calamity of so long life.`;
+// listen for discord commands
+client.on('message', (message) => {
+	// check for prefix in command
+	if (message.content.slice(0, 2) === 'g!') {
+		// extract prefix from command
+		message.content = message.content.slice(2);
 
-grammarly.analyse(text).then(correct).then((res) => console.log(res.corrected));
+		// check for specific commands
+		if (message.content === 'help') {
+		}
+	}
+});
+
+// grammarly.analyse(text).then(correct).then((res) => console.log(res.corrected));
 
 // authenticate discord
 client.login(process.env.TOKEN);
