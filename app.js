@@ -38,8 +38,12 @@ const createErr = (desc, name, image) => {
 	return new Discord.MessageEmbed().setAuthor(name, image).setColor('#F8453C').setDescription(desc);
 };
 
+const createWarning = (desc, name, image) => {
+	return new Discord.MessageEmbed().setAuthor(name, image).setColor('#e0c709').setDescription(desc);
+};
+
 // listen for discord commands
-client.on('message', (message) => {
+client.on('message', async (message) => {
 	// check for prefix in command
 	if (message.content.slice(0, 2) === 'g!') {
 		// extract prefix from command
@@ -67,6 +71,15 @@ client.on('message', (message) => {
 
 			// make sure link exists
 			if (link) {
+				// send progress message
+				let progress = await message.channel.send(
+					createWarning(
+						'Your request is being processed...',
+						message.member.user.tag,
+						message.member.user.avatarURL()
+					)
+				);
+
 				axios
 					.get(link)
 					.then((response) => {
@@ -76,7 +89,7 @@ client.on('message', (message) => {
 						// make sure it's not html
 						if (text.includes('<')) {
 							// if invalid link, send error
-							message.channel.send(
+							progress.edit(
 								createErr(
 									'Error correcting text.\nInvalid link was provided.',
 									message.member.user.tag,
@@ -90,14 +103,14 @@ client.on('message', (message) => {
 								message.author.send({
 									files: [
 										{
-											attachment: Buffer.from(res.corrected, 'utf-8'),
+											attachment: Buffer.from(res.corrected || res.original, 'utf-8'),
 											name: 'corrected_text' + Date.now() + '.txt'
 										}
 									]
 								});
 
 								// send success message in channel
-								message.channel.send(
+								progress.edit(
 									new Discord.MessageEmbed()
 										.setColor('#5BD5B8')
 										.setTitle('Corrected successfully!')
@@ -111,7 +124,7 @@ client.on('message', (message) => {
 					})
 					.catch((err) => {
 						// if invalid link, send error
-						message.channel.send(
+						progress.edit(
 							createErr(
 								'Error correcting text.\nInvalid link was provided.',
 								message.member.user.tag,
