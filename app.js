@@ -3,6 +3,7 @@ require('dotenv').config();
 
 // require modules
 const { correct, Grammarly } = require('@stewartmcgown/grammarly-api');
+const Discord = require('discord.js');
 
 // initialize grammarly api
 let grammarly;
@@ -21,9 +22,18 @@ if (process.env.GRAUTH && process.env.CSRF_TOKEN) {
 	console.log('Using grammarly FREE');
 }
 
+// initialize discord api
+const client = new Discord.Client();
+client.on('ready', () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+});
+
 // test text
 const text = `When we have shuffled off this mortal coil,
 Must give us pause - their's the respect
 That makes calamity of so long life.`;
 
 grammarly.analyse(text).then(correct).then((res) => console.log(res.corrected));
+
+// authenticate discord
+client.login(process.env.TOKEN);

@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@stewartmcgown/grammarly-api": "^1.1.2",
+    "discord.js": "^12.4.1",
     "dotenv": "^8.2.0"
   }
 }
