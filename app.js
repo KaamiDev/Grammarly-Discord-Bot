@@ -84,7 +84,29 @@ client.on('message', (message) => {
 								)
 							);
 						} else {
-							console.log(response.data);
+							// correct text using grammarly API
+							grammarly.analyse(text).then(correct).then((res) => {
+								// send corrected text as txt file to user
+								message.author.send({
+									files: [
+										{
+											attachment: Buffer.from(res.corrected, 'utf-8'),
+											name: 'corrected_text' + Date.now() + '.txt'
+										}
+									]
+								});
+
+								// send success message in channel
+								message.channel.send(
+									new Discord.MessageEmbed()
+										.setColor('#5BD5B8')
+										.setTitle('Corrected successfully!')
+										.setDescription('Your text has been corrected successfully! Check your DMs!')
+										.setAuthor(message.member.user.tag, message.member.user.avatarURL())
+										.setTimestamp()
+										.setFooter('Grammarly Bot', 'https://imgur.com/lh3fO0H.png')
+								);
+							});
 						}
 					})
 					.catch((err) => {
@@ -110,8 +132,6 @@ client.on('message', (message) => {
 		}
 	}
 });
-
-// grammarly.analyse(text).then(correct).then((res) => console.log(res.corrected));
 
 // authenticate discord
 client.login(process.env.TOKEN);
