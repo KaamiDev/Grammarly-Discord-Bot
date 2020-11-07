@@ -4,6 +4,7 @@ require('dotenv').config();
 // require modules
 const { correct, Grammarly } = require('@stewartmcgown/grammarly-api');
 const Discord = require('discord.js');
+const axios = require('axios');
 
 // initialize grammarly api
 let grammarly;
@@ -66,6 +67,36 @@ client.on('message', (message) => {
 
 			// make sure link exists
 			if (link) {
+				axios
+					.get(link)
+					.then((response) => {
+						// get text from response
+						let text = response.data;
+
+						// make sure it's not html
+						if (text.includes('<')) {
+							// if invalid link, send error
+							message.channel.send(
+								createErr(
+									'Error correcting text.\nInvalid link was provided.',
+									message.member.user.tag,
+									message.member.user.avatarURL()
+								)
+							);
+						} else {
+							console.log(response.data);
+						}
+					})
+					.catch((err) => {
+						// if invalid link, send error
+						message.channel.send(
+							createErr(
+								'Error correcting text.\nInvalid link was provided.',
+								message.member.user.tag,
+								message.member.user.avatarURL()
+							)
+						);
+					});
 			} else {
 				// if invalid link, send error
 				message.channel.send(
