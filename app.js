@@ -6,6 +6,9 @@ const { correct, Grammarly } = require('@stewartmcgown/grammarly-api');
 const Discord = require('discord.js');
 const axios = require('axios');
 
+// declare queue
+let queue = false;
+
 // initialize grammarly api
 let grammarly;
 if (process.env.GRAUTH && process.env.CSRF_TOKEN) {
@@ -71,23 +74,67 @@ client.on('message', async (message) => {
 
 			// make sure link exists
 			if (link) {
-				// send progress message
-				let progress = await message.channel.send(
-					createWarning(
-						'Your request is being processed...',
-						message.member.user.tag,
-						message.member.user.avatarURL()
-					)
-				);
+				// check queue
+				if (!queue) {
+					// make queue true
+					queue = true;
 
-				axios
-					.get(link)
-					.then((response) => {
-						// get text from response
-						let text = response.data;
+					// send progress message
+					let progress = await message.channel.send(
+						createWarning(
+							'Your request is being processed...',
+							message.member.user.tag,
+							message.member.user.avatarURL()
+						)
+					);
 
-						// make sure it's not html
-						if (text.includes('<')) {
+					axios
+						.get(link)
+						.then((response) => {
+							// get text from response
+							let text = response.data;
+
+							// make sure it's not html
+							if (text.includes('<')) {
+								// if invalid link, send error
+								progress.edit(
+									createErr(
+										'Error correcting text.\nInvalid link was provided.',
+										message.member.user.tag,
+										message.member.user.avatarURL()
+									)
+								);
+								queue = false;
+							} else {
+								// correct text using grammarly API
+								grammarly.analyse(text).then(correct).then((res) => {
+									// send corrected text as txt file to user
+									message.author.send({
+										files: [
+											{
+												attachment: Buffer.from(res.corrected || res.original, 'utf-8'),
+												name: 'corrected_text' + Date.now() + '.txt'
+											}
+										]
+									});
+
+									// send success message in channel
+									progress.edit(
+										new Discord.MessageEmbed()
+											.setColor('#5BD5B8')
+											.setTitle('Corrected successfully!')
+											.setDescription(
+												'Your text has been corrected successfully! Check your DMs!'
+											)
+											.setAuthor(message.member.user.tag, message.member.user.avatarURL())
+											.setTimestamp()
+											.setFooter('Grammarly Bot', 'https://imgur.com/lh3fO0H.png')
+									);
+									queue = false;
+								});
+							}
+						})
+						.catch((err) => {
 							// if invalid link, send error
 							progress.edit(
 								createErr(
@@ -96,42 +143,17 @@ client.on('message', async (message) => {
 									message.member.user.avatarURL()
 								)
 							);
-						} else {
-							// correct text using grammarly API
-							grammarly.analyse(text).then(correct).then((res) => {
-								// send corrected text as txt file to user
-								message.author.send({
-									files: [
-										{
-											attachment: Buffer.from(res.corrected || res.original, 'utf-8'),
-											name: 'corrected_text' + Date.now() + '.txt'
-										}
-									]
-								});
-
-								// send success message in channel
-								progress.edit(
-									new Discord.MessageEmbed()
-										.setColor('#5BD5B8')
-										.setTitle('Corrected successfully!')
-										.setDescription('Your text has been corrected successfully! Check your DMs!')
-										.setAuthor(message.member.user.tag, message.member.user.avatarURL())
-										.setTimestamp()
-										.setFooter('Grammarly Bot', 'https://imgur.com/lh3fO0H.png')
-								);
-							});
-						}
-					})
-					.catch((err) => {
-						// if invalid link, send error
-						progress.edit(
-							createErr(
-								'Error correcting text.\nInvalid link was provided.',
-								message.member.user.tag,
-								message.member.user.avatarURL()
-							)
-						);
-					});
+							queue = false;
+						});
+				} else {
+					message.channel.send(
+						createErr(
+							'The QUEUE is currently FULL!\nPlease wait until the current request finishes processing.',
+							message.member.user.tag,
+							message.member.user.avatarURL()
+						)
+					);
+				}
 			} else {
 				// if invalid link, send error
 				message.channel.send(
