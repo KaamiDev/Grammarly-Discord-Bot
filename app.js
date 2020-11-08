@@ -63,7 +63,7 @@ client.on('message', async (message) => {
 					.setThumbnail('https://imgur.com/lh3fO0H.png')
 					.addField(
 						'How to Use',
-						'`g!correct <raw pastebin>` - Bot will scan the link for errors and DM you a corrected text file.'
+						'`g!correct <raw pastebin>` - Bot will scan the link for grammatical errors and DM you a corrected text file.'
 					)
 					.setTimestamp()
 					.setFooter('Grammarly Bot', 'https://imgur.com/lh3fO0H.png')
